@@ -34,38 +34,65 @@ class _ClockState extends State<_Clock> {
     if (kDebugMode) {
       print('creating time!');
     }
-    _timer = Timer.periodic(const Duration(milliseconds: 73), (timer) {
-      setState(() {
-        _time = DateTime.now();
-      });
-    });
+    var rainbow = const <Color>[
+      Colors.yellow,
+      Colors.green,
+      Colors.blue,
+      Colors.indigo,
+      Colors.purple,
+      Colors.red,
+      Colors.orange,
+    ];
+    _currentColors = List<Color>.from(rainbow);
+    double t = 0;
+    assert(_currentColors.length > 1, 'We need at least two colors');
+    const tickInterval = 7;
+    _timer = Timer.periodic(
+      const Duration(milliseconds: tickInterval),
+      (timer) {
+        setState(() {
+          _time = DateTime.now();
+          var shiftedRainbow = <Color>[];
+          if (timer.tick % (5 * rainbow.length) == 0) {
+            if (kDebugMode) {
+              print('shifting colors');
+            }
+            var color1 = rainbow[0];
+            t = (t >= 0.9) ? 0 : t += 0.1;
+            for (var i = 1; i <= rainbow.length; i++) {
+              if (i == rainbow.length) {
+                shiftedRainbow.add(Color.lerp(color1, rainbow[i - 1], t)!);
+              } else {
+                var a = rainbow[i - 1];
+                var b = rainbow[i];
+                shiftedRainbow.add(Color.lerp(a, b, t)!);
+              }
+            }
+            _currentColors = shiftedRainbow;
+            if (kDebugMode) {
+              print('$t, /n$_currentColors');
+            }
+          }
+        });
+      },
+    );
   }
+
   late Timer _timer;
+  late List<Color> _currentColors;
   var _time = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    var colors = const <Color>[
-      Color(0xFFFF0000), // red
-      Color(0xFFFFA500), // orange
-      Color(0xFFFFFF00), // orange
-      Color(0xFF00FF00), // green
-      Color(0xFF0000FF), // blue
-      Color(0xFF4B0082), // indigo
-      Color(0xFF9400D3), // violet
-    ];
     var stops = List<double>.generate(
-      colors.length,
-      (int index) => index * (1.0 / (colors.length - 1)), // 0
+      _currentColors.length,
+      (int index) => index * (1.0 / (_currentColors.length - 1)), // 0
       growable: false,
     );
-    if (kDebugMode) {
-      print(stops);
-    }
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: colors,
+          colors: _currentColors,
           stops: stops,
         ),
       ),
@@ -89,7 +116,7 @@ class _ClockState extends State<_Clock> {
   }
 
   String getTime() =>
-      '${format(_time.hour)}:${format(_time.minute)}:${format(_time.second)}.${format(_time.millisecond, digits: 3)}${format(_time.microsecond, digits: 3)}';
+      '${format(_time.hour)}:${format(_time.minute)}:${format(_time.second)}.${format(_time.millisecond, digits: 3)}'; //${format(_time.microsecond, digits: 3)}
 
   String format(int num, {int digits = 2}) =>
       num.toString().padLeft(digits, '0');
