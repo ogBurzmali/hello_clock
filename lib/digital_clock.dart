@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 class DigitalClock {
   final List<Color> _originalColors;
   late List<Color> _currentColors;
-  DateTime _time;
+  late DateTime _startTime;
+  late DateTime _time;
 
-  DigitalClock(this._originalColors, this._time) {
+  DigitalClock(this._originalColors, DateTime time) {
+    _startTime = _time = time;
     assert(_originalColors.length > 1, 'We need at least two colors');
     _currentColors = List<Color>.from(_originalColors);
   }
@@ -25,8 +27,11 @@ class DigitalClock {
   /// After each second [_originalColors] will shift to the left by 1.
   /// e.g. If the original colors passed in are ROYGBIV then after 1s
   /// the current colors will be OYGBIVR. Further, every
-  void tick({Duration tickDuration = const Duration(seconds: 1)}) {
-    _time = _time.add(tickDuration);
+  void tick([Duration tickDuration = const Duration(seconds: 1)]) {
+    if (kDebugMode) {
+      print('ticking $tickDuration');
+    }
+    _time = _startTime.add(tickDuration);
     const millisPerSecond = 1000;
 
     final index = _time.second % length;

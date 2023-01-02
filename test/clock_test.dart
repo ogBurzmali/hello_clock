@@ -30,7 +30,7 @@ void main() {
     var clock = DigitalClock(rainbow, now);
     const duration = Duration(days: 1);
     // act
-    clock.tick(tickDuration: duration);
+    clock.tick(duration);
     // assert
     assert(clock.time == now.add(duration));
   });
@@ -50,7 +50,7 @@ void main() {
       rainbow[0],
     ];
     // act
-    clock.tick(tickDuration: duration);
+    clock.tick(duration);
     // assert
     assert(listEquals(clock.colors, oygbivr) == true);
   });
@@ -70,7 +70,7 @@ void main() {
       rainbow[1],
     ];
     // act
-    clock.tick(tickDuration: duration);
+    clock.tick(duration);
     // assert
     assert(listEquals(clock.colors, ygbivro) == true);
   });
@@ -90,7 +90,7 @@ void main() {
       rainbow[5],
     ];
     // act
-    clock.tick(tickDuration: duration);
+    clock.tick(duration);
     // assert
     assert(listEquals(clock.colors, vroygbi) == true);
   });
@@ -101,7 +101,7 @@ void main() {
     var clock = DigitalClock(rainbow, now);
     const duration = Duration(seconds: 7);
     // act
-    clock.tick(tickDuration: duration);
+    clock.tick(duration);
     // assert
     assert(listEquals(clock.colors, rainbow) == true);
   });

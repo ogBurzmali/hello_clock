@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:ui' as ui show FontFeature;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 import 'digital_clock.dart';
 
@@ -45,26 +46,33 @@ class _Clock extends StatefulWidget {
   }
 }
 
-class _ClockState extends State<_Clock> {
+class _ClockState extends State<_Clock> with SingleTickerProviderStateMixin {
   _ClockState(this.digitalClock) {
     if (kDebugMode) {
       print('creating time!');
     }
-
-    const tickInterval = Duration(milliseconds: 7);
-    _timer = Timer.periodic(
-      tickInterval,
-      (timer) {
-        setState(() {
-          digitalClock.tick(tickDuration: tickInterval);
-        });
-      },
-    );
   }
 
-  // TODO: look into using vsync or something
-  late Timer _timer;
+  late Ticker _ticker;
   DigitalClock digitalClock;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kDebugMode) {
+      print('initializing state. create ticker.');
+    }
+    _ticker = createTicker((Duration elapsed) {
+      if (kDebugMode) {
+        print('ticker is tickingc');
+      }
+      digitalClock.tick(elapsed);
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    _ticker.start();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +140,7 @@ class _ClockState extends State<_Clock> {
     if (kDebugMode) {
       print('closing clock');
     }
+    _ticker.dispose();
     super.dispose();
-    _timer.cancel();
   }
 }
